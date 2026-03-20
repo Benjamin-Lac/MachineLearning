@@ -9,7 +9,7 @@ from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
-# ── 1. Load Iris dataset ──────────────────────────────────────────────────────
+# load iris dataset
 iris = load_iris()
 X = iris.data    # shape (150, 4): sepal length/width, petal length/width
 y = iris.target  # 0=setosa, 1=versicolor, 2=virginica
@@ -19,12 +19,11 @@ print(f"Features : {iris.feature_names}")
 print(f"Classes  : {iris.target_names}")
 print(f"Shape    : X={X.shape}, y={y.shape}")
 
-# ── 2. Split 80/20 ────────────────────────────────────────────────────────────
+# 80/20 split
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
 
-# Scale features (helps convergence)
 scaler = StandardScaler()
 X_train = scaler.fit_transform(X_train)
 X_test  = scaler.transform(X_test)
@@ -32,17 +31,8 @@ X_test  = scaler.transform(X_test)
 print(f"\nTraining samples : {len(X_train)}")
 print(f"Testing  samples : {len(X_test)}")
 
-# ── 3. Perceptron implementation ──────────────────────────────────────────────
+# perceptron
 class Perceptron:
-    """
-    Multi-class Perceptron using One-vs-Rest strategy.
-    One binary perceptron is trained per class.
-
-    Hyperparameters
-    ---------------
-    learning_rate : step size for weight updates  (default 0.1)
-    n_epochs      : number of passes over training data (default 100)
-    """
 
     def __init__(self, learning_rate=0.1, n_epochs=100):
         self.lr       = learning_rate
@@ -52,7 +42,6 @@ class Perceptron:
 
     @staticmethod
     def activation(z):
-        """Step / Heaviside activation: returns 1 if z >= 0 else 0."""
         return np.where(z >= 0, 1, 0)
 
     def fit(self, X, y):
@@ -92,7 +81,7 @@ class Perceptron:
         scores = X @ self.weights.T + self.bias   # shape (n_samples, n_classes)
         return self.classes_[np.argmax(scores, axis=1)]
 
-# ── 4. Train & evaluate ───────────────────────────────────────────────────────
+# training and evaluation
 perceptron = Perceptron(learning_rate=0.1, n_epochs=100)
 perceptron.fit(X_train, y_train)
 

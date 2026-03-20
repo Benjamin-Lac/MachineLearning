@@ -10,12 +10,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 from sklearn.neural_network import MLPClassifier
 
-# ── 1. Load Iris dataset ──────────────────────────────────────────────────────
+# load iris dataset
 iris = load_iris()
 X = iris.data
 y = iris.target
 
-# ── 2. Split 80/20 ────────────────────────────────────────────────────────────
+# 80/20
 X_train, X_test, y_train, y_test = train_test_split(
     X, y, test_size=0.2, random_state=42, stratify=y
 )
@@ -27,12 +27,9 @@ X_test  = scaler.transform(X_test)
 def accuracy(model, X, y):
     return model.score(X, y) * 100
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Part (a): Baseline MLP — 1 hidden layer with 3 neurons, 1 output neuron
-# ─────────────────────────────────────────────────────────────────────────────
-print("=" * 55)
+
+#baseline
 print("Part (a): Baseline MLP — 1 hidden layer, 3 neurons")
-print("=" * 55)
 
 mlp_base = MLPClassifier(
     hidden_layer_sizes=(3,),   # 1 hidden layer with 3 neurons
@@ -62,23 +59,8 @@ test_acc_base  = accuracy(mlp_base, X_test,  y_test)
 print(f"\nTraining Accuracy : {train_acc_base:.2f}%")
 print(f"Testing  Accuracy : {test_acc_base:.2f}%")
 
-print("""
-Does MLPClassifier outperform the Perceptron? Likely YES.
-Reason:
-  A Perceptron is a single-layer linear classifier. It can only separate
-  classes with a linear boundary, which fails for non-linearly separable data.
-  The MLP introduces hidden layers with non-linear activation functions (ReLU),
-  allowing it to learn curved, complex decision boundaries. Even with just
-  3 hidden neurons, the MLP can capture non-linear patterns the Perceptron
-  cannot.
-""")
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Part (b): Deeper / wider MLP to improve accuracy
-# ─────────────────────────────────────────────────────────────────────────────
-print("=" * 55)
+# deeper/ wider 
 print("Part (b): Improved MLP — deeper architecture")
-print("=" * 55)
 
 mlp_deep = MLPClassifier(
     hidden_layer_sizes=(64, 32, 16),  # 3 hidden layers
@@ -102,9 +84,7 @@ test_acc_deep  = accuracy(mlp_deep, X_test,  y_test)
 print(f"\nTraining Accuracy : {train_acc_deep:.2f}%")
 print(f"Testing  Accuracy : {test_acc_deep:.2f}%")
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Summary comparison
-# ─────────────────────────────────────────────────────────────────────────────
+# results
 print("\n── Accuracy Comparison ──")
 print(f"{'Model':35s} {'Train Acc':>10} {'Test Acc':>10}")
 print(f"{'Baseline MLP (1 hidden, 3 neurons)':35s} {train_acc_base:>9.2f}% {test_acc_base:>9.2f}%")
@@ -112,11 +92,3 @@ print(f"{'Improved MLP (64-32-16 neurons)':35s} {train_acc_deep:>9.2f}% {test_ac
 
 improved = test_acc_deep > test_acc_base
 print(f"\nImproved classification performance? {'YES' if improved else 'NO (already near perfect)'}")
-print("""
-Explanation:
-  Adding more layers and neurons gives the network greater representational capacity.
-  Each additional layer can model increasingly abstract features. More neurons per
-  layer allow the model to capture finer decision boundaries. However, for a simple
-  dataset like Iris (150 samples, 4 features), even the baseline often reaches
-  high accuracy, so improvements may be modest or the baseline may already be optimal.
-""")
