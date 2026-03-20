@@ -153,7 +153,7 @@ def policy_evaluation(env, V, pi, gamma, noise):
             V_new[r, c] = val
     return V_new
 
-def policy_improvement(env, V, gamma, noise):
+def policy_improvement(env, V, pi_old, gamma, noise):
     pi_new = np.zeros((env.H, env.W, 4))
     stable = True
     for r in range(env.H):
@@ -168,6 +168,8 @@ def policy_improvement(env, V, gamma, noise):
                     q_vals[a] += t_prob * (r_val + gamma * V[s_next[0], s_next[1]])
             best_actions = np.flatnonzero(np.isclose(q_vals, q_vals.max()))
             pi_new[r, c, best_actions] = 1.0 / len(best_actions)
+            if not np.allclose(pi_new[r, c, :], pi_old[r, c, :]):
+                stable = False
     return pi_new, stable
 
 def policy_iteration(env, gamma, noise, max_eval_iters=100, tol=1e-6):
@@ -182,9 +184,9 @@ def policy_iteration(env, gamma, noise, max_eval_iters=100, tol=1e-6):
             V = V_new
         V = V_new
         # Policy Improvement
-        pi_new, _ = policy_improvement(env, V, gamma, noise)
-        # Check stability: did policy change?
-        if np.allclose(pi_new, pi):
+        pi_new, stable = policy_improvement(env, V, pi, gamma, noise)
+        # Stop when greedy improvement no longer changes the policy.
+        if stable:
             break
         pi = pi_new
     return V, pi
@@ -247,7 +249,7 @@ class Viewer:
     def on_iter(self, _):
         for _ in range(15):
             self.V = policy_evaluation(self.env, self.V, self.pi, self.gamma, self.noise)
-        self.pi, _ = policy_improvement(self.env, self.V, self.gamma, self.noise)
+        self.pi, _ = policy_improvement(self.env, self.V, self.pi, self.gamma, self.noise)
         self.redraw()
     def on_run(self, _):
         self.V, self.pi = policy_iteration(self.env, self.gamma, self.noise)
